@@ -46,7 +46,7 @@ async function fetchJupiterMarketCap(tokenAddress: string): Promise<string | nul
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
-      next: { revalidate: 300 }, // Cache for 5 minutes
+      cache: 'no-store',
     });
 
     if (!response.ok) {
@@ -138,7 +138,7 @@ async function fetchJupiterLiquidity(tokenAddress: string): Promise<number | nul
         headers: {
           'Accept': 'application/json',
         },
-        next: { revalidate: 60 }, // Cache for 60 seconds
+        cache: 'no-store',
       }
     );
 
@@ -170,7 +170,7 @@ async function fetchJupiterLiquidity(tokenAddress: string): Promise<number | nul
         headers: {
           'Accept': 'application/json',
         },
-        next: { revalidate: 60 },
+        cache: 'no-store',
       }
     );
 
@@ -295,7 +295,7 @@ export async function POST(request: NextRequest) {
       },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
         },
       }
     );

@@ -196,12 +196,13 @@ const fetchSolanaTokenData = async (
   }
 
   try {
-    const response = await fetch('/api/solana/token-data', {
+    const response = await fetch(`/api/solana/token-data?t=${Date.now()}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ addresses }),
+      cache: 'no-store',
     });
 
     if (!response.ok) {
@@ -920,6 +921,55 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
 
     fetchTokens();
   }, [chainId, processAndSetTokens, fetchTokenLogos, standardTokens, vaultoTokens, activeTab, privateTokens]);
+
+  // Periodic refresh for private token market cap data
+  useEffect(() => {
+    // Only set up periodic refresh when private tab is active
+    if (activeTab !== 'private') {
+      return;
+    }
+
+    const refreshPrivateTokensData = async () => {
+      try {
+        const addresses = privateTokens.map((token) => token.address);
+        const tokenData = await fetchSolanaTokenData(addresses);
+        
+        // Create a map for quick lookup
+        const dataMap = new Map(
+          tokenData.map((data) => [data.address, data])
+        );
+        
+        // Enrich private tokens with fetched data
+        setTokens((currentTokens) => {
+          return currentTokens.map((token) => {
+            const data = dataMap.get(token.address);
+            if (data) {
+              return {
+                ...token,
+                tvlUSD: data.tvlUSD,
+                volumeUSD: data.volumeUSD,
+                marketCap: data.marketCap,
+                marketCapFormatted: data.marketCapFormatted,
+              };
+            }
+            return token;
+          });
+        });
+      } catch (error) {
+        console.error('Error refreshing private tokens data:', error);
+        // Silently fail - don't disrupt the UI
+      }
+    };
+
+    // Refresh immediately on mount, then every 30 seconds
+    refreshPrivateTokensData();
+    const intervalId = setInterval(refreshPrivateTokensData, 30000);
+
+    // Cleanup interval on unmount or tab switch
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [activeTab, privateTokens]);
 
   // Default tokens to show when search is first opened
   const getDefaultTokens = useCallback((): Token[] => {
