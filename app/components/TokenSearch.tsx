@@ -1398,7 +1398,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
 
   return (
     <>
-      <div ref={searchRef} className="relative w-full max-w-[280px] md:max-w-sm mx-auto">
+      <div ref={searchRef} className="relative w-full max-w-full md:max-w-sm mx-auto">
         <div className="relative">
           <input
             ref={inputRef}
@@ -1413,7 +1413,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
             onBlur={() => {
               setIsFocused(false);
             }}
-            className="w-full px-4 py-3 md:px-4 md:py-3 pl-10 md:pl-10 pr-10 md:pr-10 bg-gray-800/50 border border-gray-600/50 md:border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-gray-500 md:focus:border-gray-500 focus:ring-1 focus:ring-gray-500 md:focus:ring-gray-500 text-sm md:text-base transition-all duration-200"
+            className="w-full px-3 py-2.5 md:px-4 md:py-3 pl-10 md:pl-10 pr-10 md:pr-10 bg-gray-800/50 border border-gray-600/50 md:border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/50 md:focus:border-gray-500 focus:ring-1 focus:ring-yellow-400/30 md:focus:ring-gray-500 text-sm md:text-base transition-all duration-200 min-h-[44px]"
           />
           <svg
             className="absolute left-3 md:left-3 top-1/2 -translate-y-1/2 w-4 h-4 md:w-4 md:h-4 text-gray-400"
@@ -1440,7 +1440,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
 
         {/* Dropdown Results */}
         {showResults && (
-          <div className="absolute top-full left-0 right-0 mt-1 border border-gray-600/50 rounded-lg shadow-lg z-50 max-h-[60vh] md:max-h-64 overflow-y-auto token-dropdown-scrollbar" style={{ backgroundColor: '#1f2937' }}>
+          <div className="absolute top-full left-0 right-0 mt-1 border border-gray-600/50 rounded-lg shadow-lg z-[60] max-h-[50vh] md:max-h-64 overflow-y-auto token-dropdown-scrollbar" style={{ backgroundColor: '#1f2937' }}>
             {isLoading || isLoadingUniswap ? (
               <div className="p-4 flex flex-col items-center justify-center gap-2">
                 <div className="relative w-6 h-6">
@@ -1450,7 +1450,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                 <span className="text-gray-400 text-sm">Loading tokens...</span>
               </div>
             ) : filteredTokens.length > 0 ? (
-              <ul className="py-2 px-2">
+              <ul className="py-1.5 px-1.5 md:py-2 md:px-2">
                 {filteredTokens.map((token) => {
                   const logoKey = `${token.chainId}-${token.address.toLowerCase()}`;
                   const fetchedLogoUrl = logoUrls.get(logoKey);
@@ -1495,16 +1495,16 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                     <li
                       key={`${token.chainId}-${token.address}`}
                       onClick={() => handleTokenClick(token)}
-                      className="px-3 py-3 md:px-2 md:py-2 hover:bg-gray-600/50 rounded-lg cursor-pointer transition-colors duration-200 flex items-center gap-3 md:gap-3"
+                      className="px-2 py-2 md:px-3 md:py-2.5 hover:bg-gray-600/50 rounded-lg cursor-pointer transition-colors duration-200 flex items-center gap-2 md:gap-3"
                     >
-                      <div className="relative w-8 h-8 md:w-6 md:h-6 flex-shrink-0">
+                      <div className="relative w-6 h-6 md:w-8 md:h-8 flex-shrink-0">
                         {!showFallback && displayLogoUrl ? (
                           <Image
                             src={displayLogoUrl}
                             alt={token.symbol}
-                            width={32}
-                            height={32}
-                            className="w-8 h-8 md:w-6 md:h-6 rounded-full"
+                            width={24}
+                            height={24}
+                            className="w-6 h-6 md:w-8 md:h-8 rounded-full"
                             onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                               console.warn('TokenSearch: Failed to load logo', {
                                 symbol: token.symbol,
@@ -1531,7 +1531,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                         {/* Fallback circle - shown when no logo or all image sources fail */}
                         {showFallback && (
                           <div
-                            className="w-8 h-8 md:w-6 md:h-6 rounded-full flex items-center justify-center text-xs md:text-[10px] font-semibold"
+                            className="w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-[10px] md:text-xs font-semibold"
                             style={{
                               backgroundColor: fallbackColor,
                               color: fallbackTextColor,
@@ -1543,22 +1543,22 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                       </div>
                       <div className="flex-1 min-w-0">
                         {activeTab === 'private' ? (
-                          // Display for private tokens with liquidity/marketcap data
+                          // Display for private tokens - matches public token styling
                           <>
-                            <div className="flex items-center justify-between gap-2 mb-1.5 md:mb-1">
-                              <div className="text-white text-base md:text-sm font-medium">
-                                {token.name}
+                            <div className="flex items-center justify-between gap-1 md:gap-2 mb-1 md:mb-1">
+                              <div className="text-white text-sm md:text-sm font-medium">
+                                {token.symbol}
                               </div>
                               <div className="flex items-center gap-1">
                                 {(() => {
-                                  // Show liquidity (TVL) from Jupiter if available
+                                  // Show TVL from Jupiter if available
                                   const tvlValue = token.tvlUSD;
                                   const hasTVL = tvlValue !== undefined && tvlValue > 0;
                                   
                                   if (hasTVL) {
                                     return (
-                                      <span className="px-1 py-0.25 text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
-                                        {formatTVL(tvlValue)} <span className="text-[9px] text-white">TVL</span>
+                                      <span className="px-1.5 py-0.5 md:px-1 md:py-0.25 text-[9px] md:text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
+                                        {formatTVL(tvlValue)} <span className="text-[8px] md:text-[9px] text-white">TVL</span>
                                       </span>
                                     );
                                   }
@@ -1572,15 +1572,15 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                   if (marketCapFormatted) {
                                     // Display Jupiter's formatted value with MCap label (e.g., "$472B MCap")
                                     return (
-                                      <span className="px-1 py-0.25 text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
-                                        {marketCapFormatted} <span className="text-[9px] text-white">MCap</span>
+                                      <span className="px-1.5 py-0.5 md:px-1 md:py-0.25 text-[9px] md:text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
+                                        {marketCapFormatted} <span className="text-[8px] md:text-[9px] text-white">MCap</span>
                                       </span>
                                     );
                                   } else if (marketCapValue !== undefined && marketCapValue > 0) {
                                     // Fall back to formatted CoinGecko value with MCap label
                                     return (
-                                      <span className="px-1 py-0.25 text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
-                                        {formatTVL(marketCapValue)} <span className="text-[9px] text-white">MCap</span>
+                                      <span className="px-1.5 py-0.5 md:px-1 md:py-0.25 text-[9px] md:text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
+                                        {formatTVL(marketCapValue)} <span className="text-[8px] md:text-[9px] text-white">MCap</span>
                                       </span>
                                     );
                                   }
@@ -1588,24 +1588,27 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                 })()}
                               </div>
                             </div>
-                            <div className="flex items-center justify-between gap-2 mb-1.5 md:mb-1">
-                              <a
-                                href={`https://prestocks.com/${token.name.toLowerCase()}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="text-gray-400 text-sm md:text-xs hover:text-yellow-400 transition-colors"
-                              >
-                                Prestock {token.name}
-                              </a>
+                            <div className="flex items-center justify-between gap-1 md:gap-2 mb-1 md:mb-1">
+                              <div className="text-gray-400 text-xs md:text-sm truncate">
+                                <span className="block md:hidden">Prestock {token.name}</span>
+                                <a
+                                  href={`https://prestocks.com/${token.name.toLowerCase()}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="hidden md:inline text-gray-400 hover:text-yellow-400 transition-colors"
+                                >
+                                  Prestock {token.name}
+                                </a>
+                              </div>
                               {(() => {
                                 const displayVolume = token.volumeUSD;
                                 const hasVolume = displayVolume !== undefined && displayVolume > 0;
                                 
                                 if (hasVolume) {
                                   return (
-                                    <span className="px-1 py-0.25 text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
-                                      {formatTVL(displayVolume)} <span className="text-[9px] text-white">24h</span>
+                                    <span className="px-1.5 py-0.5 md:px-1 md:py-0.25 text-[9px] md:text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
+                                      {formatTVL(displayVolume)} <span className="text-[8px] md:text-[9px] text-white">24h</span>
                                     </span>
                                   );
                                 }
@@ -1614,8 +1617,8 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                             </div>
                             <div className="flex items-center justify-between gap-1 md:gap-2">
                               <div className="flex items-center gap-1 md:gap-2">
-                                <span className="text-gray-600 text-xs font-mono">{truncateAddress(token.address, 6, 4)}</span>
-                                <div className="flex items-center gap-0.5 md:gap-1">
+                                <span className="text-gray-600 text-[10px] md:text-xs font-mono">{truncateAddress(token.address, 6, 4)}</span>
+                                <div className="hidden md:flex items-center gap-0.5 md:gap-1">
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -1629,7 +1632,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                         },
                                       });
                                     }}
-                                    className="inline-flex items-center justify-center w-4 h-4 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 rounded transition-colors"
+                                    className="inline-flex items-center justify-center w-5 h-5 md:w-4 md:h-4 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 rounded transition-colors"
                                     title="Copy address"
                                     aria-label="Copy address"
                                   >
@@ -1639,7 +1642,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                       viewBox="0 0 24 24"
                                       strokeWidth={2}
                                       stroke="currentColor"
-                                      className="w-3 h-3"
+                                      className="w-4 h-4 md:w-3 md:h-3"
                                     >
                                       <path
                                         strokeLinecap="round"
@@ -1653,7 +1656,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={(e) => e.stopPropagation()}
-                                    className="inline-flex items-center justify-center w-4 h-4 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 rounded transition-colors"
+                                    className="inline-flex items-center justify-center w-5 h-5 md:w-4 md:h-4 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 rounded transition-colors"
                                     title="View on Solscan"
                                   >
                                     <svg
@@ -1662,7 +1665,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                       viewBox="0 0 24 24"
                                       strokeWidth={2}
                                       stroke="currentColor"
-                                      className="w-3 h-3"
+                                      className="w-4 h-4 md:w-3 md:h-3"
                                     >
                                       <path
                                         strokeLinecap="round"
@@ -1686,7 +1689,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                       onClick={(e) => {
                                         e.stopPropagation();
                                       }}
-                                      className="inline-flex items-center justify-center h-4 px-2 text-[10px] font-semibold bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-gray-800 rounded transition-all duration-200 shadow-sm shadow-yellow-500/25"
+                                      className="hidden md:inline-flex items-center justify-center min-h-[32px] md:min-h-[24px] px-2 text-[10px] font-semibold bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-gray-800 rounded transition-all duration-200 shadow-sm shadow-yellow-500/25"
                                       title="View Jupiter price chart"
                                     >
                                       <span>More Info</span>
@@ -1700,13 +1703,13 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                         ) : (
                           // Full display for public tokens
                           <>
-                            <div className="flex items-center justify-between gap-2 mb-1.5 md:mb-1">
-                              <div className="text-white text-base md:text-sm font-medium">
+                            <div className="flex items-center justify-between gap-1 md:gap-2 mb-1 md:mb-1">
+                              <div className="text-white text-sm md:text-sm font-medium">
                                 {token.symbol}
                                 {(() => {
                                   const poolPair = getTopPoolPair(token);
                                   if (poolPair) {
-                                    return <span className="text-gray-400 font-normal text-xs md:text-[10px]"> ({poolPair})</span>;
+                                    return <span className="text-gray-400 font-normal text-[10px] md:text-xs"> ({poolPair})</span>;
                                   }
                                   return null;
                                 })()}
@@ -1717,24 +1720,24 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                 
                                 if (hasTVL) {
                                   return (
-                                    <span className="px-1 py-0.25 text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
-                                      {formatTVL(displayTVL)} <span className="text-[9px] text-white">TVL</span>
+                                    <span className="px-1.5 py-0.5 md:px-1 md:py-0.25 text-[9px] md:text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
+                                      {formatTVL(displayTVL)} <span className="text-[8px] md:text-[9px] text-white">TVL</span>
                                     </span>
                                   );
                                 }
                                 return null;
                               })()}
                             </div>
-                            <div className="flex items-center justify-between gap-2 mb-1.5 md:mb-1">
-                              <div className="text-gray-400 text-sm md:text-xs truncate">{token.name}</div>
+                            <div className="flex items-center justify-between gap-1 md:gap-2 mb-1 md:mb-1">
+                              <div className="text-gray-400 text-xs md:text-sm truncate">{token.name}</div>
                               {(() => {
                                 const displayVolume = getDisplayVolume(token);
                                 const hasVolume = displayVolume !== null && displayVolume > 0;
                                 
                                 if (hasVolume) {
                                   return (
-                                    <span className="px-1 py-0.25 text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
-                                      {formatTVL(displayVolume)} <span className="text-[9px] text-white">24h</span>
+                                    <span className="px-1.5 py-0.5 md:px-1 md:py-0.25 text-[9px] md:text-[10px] font-medium bg-yellow-400/20 text-yellow-400 rounded flex-shrink-0">
+                                      {formatTVL(displayVolume)} <span className="text-[8px] md:text-[9px] text-white">24h</span>
                                     </span>
                                   );
                                 }
@@ -1743,8 +1746,8 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                             </div>
                             <div className="flex items-center justify-between gap-1 md:gap-2">
                               <div className="flex items-center gap-1 md:gap-2">
-                                <span className="text-gray-600 text-xs font-mono">{truncateAddress(token.address, 6, 4)}</span>
-                                <div className="flex items-center gap-0.5 md:gap-1">
+                                <span className="text-gray-600 text-[10px] md:text-xs font-mono">{truncateAddress(token.address, 6, 4)}</span>
+                                <div className="hidden md:flex items-center gap-0.5 md:gap-1">
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -1758,7 +1761,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                         },
                                       });
                                     }}
-                                    className="inline-flex items-center justify-center w-4 h-4 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 rounded transition-colors"
+                                    className="inline-flex items-center justify-center w-5 h-5 md:w-4 md:h-4 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 rounded transition-colors"
                                     title="Copy address"
                                     aria-label="Copy address"
                                   >
@@ -1768,7 +1771,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                       viewBox="0 0 24 24"
                                       strokeWidth={2}
                                       stroke="currentColor"
-                                      className="w-3 h-3"
+                                      className="w-4 h-4 md:w-3 md:h-3"
                                     >
                                       <path
                                         strokeLinecap="round"
@@ -1786,7 +1789,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         onClick={(e) => e.stopPropagation()}
-                                        className="inline-flex items-center justify-center w-4 h-4 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 rounded transition-colors"
+                                        className="inline-flex items-center justify-center w-5 h-5 md:w-4 md:h-4 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 rounded transition-colors"
                                         title="View on Explorer"
                                       >
                                         <svg
@@ -1795,7 +1798,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                           viewBox="0 0 24 24"
                                           strokeWidth={2}
                                           stroke="currentColor"
-                                          className="w-3 h-3"
+                                          className="w-4 h-4 md:w-3 md:h-3"
                                         >
                                           <path
                                             strokeLinecap="round"
@@ -1820,7 +1823,7 @@ export default function TokenSearch({ chainId, activeTab = 'public' }: TokenSear
                                         e.stopPropagation();
                                       }}
                                       prefetch={true}
-                                      className="inline-flex items-center justify-center h-4 px-2 text-[10px] font-semibold bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-gray-800 rounded transition-all duration-200 shadow-sm shadow-yellow-500/25"
+                                      className="hidden md:inline-flex items-center justify-center min-h-[32px] md:min-h-[24px] px-2 text-[10px] font-semibold bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-gray-800 rounded transition-all duration-200 shadow-sm shadow-yellow-500/25"
                                       title="View token details"
                                     >
                                       <span>More Info</span>

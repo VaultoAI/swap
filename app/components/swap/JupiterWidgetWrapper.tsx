@@ -94,7 +94,7 @@ export default function JupiterWidgetWrapper() {
           displayMode: 'integrated',
           integratedTargetId: 'jupiter-widget-container',
           containerStyles: {
-            width: '100%', // 100% of the container (which is 30% of parent)
+            width: '100%', // 100% of the container (full width on mobile, 392px on desktop - matches CowSwap)
             height: '500px', // Match CowSwap height
             borderRadius: '0px', // Match CowSwap (no border radius in container)
           },
@@ -244,28 +244,36 @@ export default function JupiterWidgetWrapper() {
   return (
     <div className="w-full max-w-6xl mx-auto px-4" ref={containerRef}>
       <div className="w-full flex items-center justify-center min-h-[500px] relative">
-        {/* Background element behind widget with rounded corners */}
-        <div 
-          className="absolute -top-2 bottom-0 w-[35%] left-1/2 -translate-x-1/2 rounded-2xl"
-          style={{
-            backgroundColor: 'rgb(31, 41, 55)', // Jupiter dark theme background color (matches --jupiter-plugin-background)
-            zIndex: 0,
-          }}
-        />
-        
-        {!isJupiterLoaded && (
-          <div className="flex items-center justify-center min-h-[500px] relative z-10">
-            <div className="text-gray-400 text-sm">Loading Jupiter widget...</div>
-          </div>
-        )}
-        <div
-          id="jupiter-widget-container"
-          className={`w-[70%] min-h-[500px] relative z-10 mx-auto ${!isJupiterLoaded ? 'hidden' : ''}`}
-          style={{
-            borderRadius: '0px', // Match CowSwap widget (no border radius)
-            overflow: 'hidden',
-          }}
-        />
+        {/* Container for both background shape and widget - ensures they're perfectly aligned */}
+        {/* Mobile: full width with padding, Desktop: matches CowSwap layout */}
+        <div className="relative w-full md:w-[392px] min-h-[500px]">
+          {/* Background element behind widget with rounded corners - matches CowSwap exactly */}
+          <div 
+            className="absolute rounded-2xl left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0"
+            style={{
+              width: 'calc(100vw - 2rem)', // Fixed width on mobile (full viewport minus padding)
+              maxWidth: '392px', // Fixed max width on desktop
+              height: '500px', // Reduced height on mobile
+              top: '0',
+              backgroundColor: 'rgb(31, 41, 55)', // Dark theme background color (matches CowSwap)
+              zIndex: 0,
+            }}
+          />
+          
+          {!isJupiterLoaded && (
+            <div className="flex items-center justify-center min-h-[500px] relative z-10">
+              <div className="text-gray-400 text-sm">Loading Jupiter widget...</div>
+            </div>
+          )}
+          <div
+            id="jupiter-widget-container"
+            className={`w-full md:w-full min-h-[500px] relative z-10 ${!isJupiterLoaded ? 'hidden' : ''}`}
+            style={{
+              borderRadius: '0px', // Match CowSwap widget (no border radius)
+              overflow: 'hidden',
+            }}
+          />
+        </div>
       </div>
     </div>
   );

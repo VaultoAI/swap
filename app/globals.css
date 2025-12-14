@@ -195,6 +195,49 @@ body {
     will-change: background-color, border-color;
     backface-visibility: hidden;
   }
+  
+  /* Mobile tab switcher styles */
+  nav[aria-label="Market navigation"] {
+    /* Ensure proper spacing and touch targets */
+    min-height: 44px;
+  }
+  
+  /* Mobile header layout adjustments */
+  header[role="banner"] .container {
+    /* Ensure proper spacing for mobile header rows */
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+  
+  /* Mobile header - ensure proper height for stacked layout */
+  header[role="banner"] .block.md\\:hidden {
+    /* Mobile header layout container - ensure proper spacing */
+    min-height: auto;
+  }
+  
+  /* Mobile search bar dropdown z-index - ensure it appears above header */
+  .token-dropdown-scrollbar {
+    z-index: 60 !important;
+  }
+  
+  /* Ensure mobile header elements don't overlap */
+  header[role="banner"] > div > div.block {
+    /* Mobile header layout container */
+    z-index: 50;
+    position: relative;
+  }
+  
+  /* Mobile tab switcher - ensure proper touch targets and spacing */
+  nav[aria-label="Market navigation"].block {
+    /* Full width on mobile */
+    width: 100%;
+  }
+  
+  /* Mobile tab switcher buttons - ensure proper sizing */
+  nav[aria-label="Market navigation"].block button {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 /* Desktop header sticky positioning */
@@ -389,19 +432,34 @@ body {
   touch-action: manipulation !important;
 }
 
+/* Override RainbowKit ConnectButton.Custom button styles for mobile */
+button[title="Connect Wallet"],
+button[aria-label="Connect Wallet"] {
+  width: auto !important;
+  height: auto !important;
+  min-width: 80px !important;
+  padding: 0.5rem 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 /* Ensure mobile connect button has full hover and click area */
 @media (max-width: 767px) {
   button[aria-label="Connect Wallet"] {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 80px !important;
     min-height: 44px !important;
-    padding: 0 !important;
+    padding: 0.625rem 1rem !important;
     margin: 0 !important;
     pointer-events: auto !important;
     cursor: pointer !important;
     position: relative !important;
     z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
   
   button[aria-label="Connect Wallet"]:hover {

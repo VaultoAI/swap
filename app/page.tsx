@@ -100,12 +100,12 @@ function WalletButton({ activeTab }: { activeTab: 'public' | 'private' }) {
     return (
       <button
         onClick={handleSolanaConnect}
-        className="px-2 py-1 md:px-4 md:py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-black font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/25 flex items-center justify-center gap-2"
+        className="px-4 py-2 md:px-4 md:py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-black font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/25 flex items-center justify-center gap-2 min-w-[80px]"
         title="Connect Solana Wallet"
         aria-label="Connect Solana Wallet"
       >
         <svg
-          className="w-5 h-5 md:w-5 md:h-5"
+          className="hidden md:block w-5 h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -118,7 +118,7 @@ function WalletButton({ activeTab }: { activeTab: 'public' | 'private' }) {
             d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
           />
         </svg>
-        <span className="hidden md:inline text-sm">Connect</span>
+        <span className="inline md:inline text-sm whitespace-nowrap">Connect</span>
       </button>
     );
   }
@@ -167,12 +167,13 @@ function WalletButton({ activeTab }: { activeTab: 'public' | 'private' }) {
               trackWalletConnectClick();
               openConnectModal();
             }}
-            className="px-2 py-1 md:px-4 md:py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-black font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/25 flex items-center justify-center gap-2"
+            className="px-4 py-2.5 md:px-4 md:py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-black font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/25 flex items-center justify-center gap-2 min-w-[80px] w-auto h-auto !w-auto !h-auto"
+            style={{ width: 'auto', height: 'auto', minWidth: '80px' }}
             title="Connect Wallet"
             aria-label="Connect Wallet"
           >
             <svg
-              className="w-5 h-5 md:w-5 md:h-5"
+              className="hidden md:block w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -185,7 +186,7 @@ function WalletButton({ activeTab }: { activeTab: 'public' | 'private' }) {
                 d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
               />
             </svg>
-            <span className="hidden md:inline text-sm">Connect</span>
+            <span className="inline md:inline text-sm whitespace-nowrap">Connect</span>
           </button>
         );
       }}
@@ -194,7 +195,7 @@ function WalletButton({ activeTab }: { activeTab: 'public' | 'private' }) {
 }
 
 
-// Market tab switcher component
+// Market tab switcher component - Desktop version
 function MarketTabSwitcher({ activeTab, onTabChange }: { activeTab: 'public' | 'private'; onTabChange: (tab: 'public' | 'private') => void }) {
   return (
     <nav aria-label="Market navigation" className="hidden md:block">
@@ -228,6 +229,40 @@ function MarketTabSwitcher({ activeTab, onTabChange }: { activeTab: 'public' | '
           </button>
         </li>
       </ul>
+    </nav>
+  );
+}
+
+// Mobile market tab switcher component
+function MobileMarketTabSwitcher({ activeTab, onTabChange }: { activeTab: 'public' | 'private'; onTabChange: (tab: 'public' | 'private') => void }) {
+  return (
+    <nav aria-label="Market navigation" className="block md:hidden">
+      <div className="flex items-center gap-1 bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-lg p-0.5">
+        <button
+          onClick={() => onTabChange('public')}
+          className={`flex-1 px-2 py-1 text-xs font-semibold rounded-md transition-all duration-200 ${
+            activeTab === 'public'
+              ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black shadow-md shadow-yellow-500/25'
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
+          aria-label="Public Markets"
+          aria-pressed={activeTab === 'public'}
+        >
+          Public
+        </button>
+        <button
+          onClick={() => onTabChange('private')}
+          className={`flex-1 px-2 py-1 text-xs font-semibold rounded-md transition-all duration-200 ${
+            activeTab === 'private'
+              ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black shadow-md shadow-yellow-500/25'
+              : 'text-gray-400 hover:text-gray-300'
+          }`}
+          aria-label="Private Markets"
+          aria-pressed={activeTab === 'private'}
+        >
+          Private
+        </button>
+      </div>
     </nav>
   );
 }
@@ -273,28 +308,20 @@ export default function Home() {
       </div>
       {/* Header - Sticky on mobile */}
       <header className="sticky top-0 left-0 right-0 z-50 backdrop-blur-sm pt-2 w-full bg-transparent border-transparent" role="banner" style={{ position: 'sticky', top: 0 }}>
-        <div className="container mx-auto px-4 py-3 relative">
-          <div className="flex items-center justify-between gap-2 md:gap-4">
-            <div className="flex items-center gap-3 md:gap-6 flex-shrink-0">
-              {/* Mobile Logo */}
-              <Image 
-                src="/mobilelogo.png" 
-                alt="Vaulto Swap" 
-                width={32} 
-                height={32}
-                className="object-contain w-8 h-8 md:hidden"
-                priority
-              />
+        <div className="container mx-auto px-4 py-3 md:py-3 relative">
+          {/* Desktop Header Layout */}
+          <div className="hidden md:flex items-center justify-between gap-4">
+            <div className="flex items-center gap-6 flex-shrink-0">
               {/* Desktop Logo */}
               <Image 
                 src="/logo.png" 
                 alt="Vaulto Swap" 
                 width={120} 
                 height={40}
-                className="object-contain w-24 h-auto hidden md:block"
+                className="object-contain w-24 h-auto"
                 priority
               />
-              <nav aria-label="Main navigation" className="hidden md:block">
+              <nav aria-label="Main navigation">
                 <ul className="flex items-center gap-4">
                   <li>
                     <a 
@@ -329,10 +356,46 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Token Search Bar - Centered in header */}
-          <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-md px-4 pointer-events-none">
+          {/* Desktop Token Search Bar - Centered in header */}
+          <div className="hidden md:block absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-md px-4 pointer-events-none">
             <div className="flex justify-center pointer-events-auto">
               <TokenSearch chainId={chainId} activeTab={activeTab} />
+            </div>
+          </div>
+
+          {/* Mobile Header Layout */}
+          <div className="block md:hidden space-y-3">
+            {/* Top row: Logo, Vaulto name/Trade Equities text, and Wallet Button */}
+            <div className="flex items-center gap-3">
+              <Image
+                src="/mobilelogo.png"
+                alt="Vaulto Swap"
+                width={48}
+                height={48}
+                className="object-contain w-12 h-12 flex-shrink-0"
+                priority
+              />
+              <div className="flex-1">
+                <h2 className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 via-yellow-500 to-yellow-400 mb-1 tracking-tight drop-shadow-lg" style={{textShadow: '0 0 20px rgba(255, 215, 0, 0.3)'}}>
+                  Vaulto
+                </h2>
+                <p className="text-white text-base sm:text-lg font-light">
+                  Trade Equities 24/7
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <WalletButton activeTab={activeTab} />
+              </div>
+            </div>
+            
+            {/* Second row: Search Bar */}
+            <div className="w-full">
+              <TokenSearch chainId={chainId} activeTab={activeTab} />
+            </div>
+            
+            {/* Third row: Tab Switcher */}
+            <div className="w-full">
+              <MobileMarketTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
           </div>
         </div>
@@ -342,8 +405,8 @@ export default function Home() {
         <section aria-label="Token swap interface" className="w-full h-full flex flex-col md:block md:h-auto md:min-h-0">
           <h1 className="sr-only">Vaulto Swap - Trade Tokenized Stocks with Stablecoins</h1>
           
-          {/* Typography Section */}
-          <div className="text-center mb-6 md:mb-8 mt-0 md:mt-0 pt-4 md:pt-0">
+          {/* Typography Section - Hidden on mobile, shown on desktop */}
+          <div className="hidden md:block text-center mb-6 md:mb-8 mt-0 md:mt-0 pt-4 md:pt-0">
             <h2 className="text-6xl sm:text-7xl md:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 via-yellow-500 to-yellow-400 mb-3 sm:mb-4 md:mb-4 tracking-tight drop-shadow-lg" style={{textShadow: '0 0 20px rgba(255, 215, 0, 0.3)'}}>
               Vaulto
             </h2>

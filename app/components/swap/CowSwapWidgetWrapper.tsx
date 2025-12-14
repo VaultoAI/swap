@@ -581,27 +581,30 @@ export default function CowSwapWidgetWrapper({ onTokenSelect }: CowSwapWidgetWra
     <div className="w-full max-w-6xl mx-auto px-4" ref={widgetContainerRef}>
       <div className="w-full flex items-center justify-center min-h-[500px] relative">
         {/* Container for both background shape and widget - ensures they're perfectly aligned */}
-        <div className="relative" style={{ width: '392px', minHeight: '500px' }}>
-          {/* Background element behind widget with rounded corners - fixed size */}
+        {/* Mobile: full width with padding, Desktop: fixed 392px width */}
+        <div className="relative w-full md:w-[392px] min-h-[500px]">
+          {/* Background element behind widget with rounded corners - fixed size on mobile, responsive on desktop */}
           <div 
-            className="absolute rounded-2xl"
+            className="absolute rounded-2xl left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0"
             style={{
-              width: '392px',
-              height: '500px',
+              width: 'calc(100vw - 2rem)', // Fixed width on mobile (full viewport minus padding)
+              maxWidth: '392px', // Fixed max width on desktop
+              height: '500px', // Reduced height on mobile
               top: '0',
-              left: '0',
               backgroundColor: 'rgb(31, 41, 55)', // Dark theme background color (matches Jupiter)
               zIndex: 0,
             }}
           />
           
-          {/* Widget container - positioned on top of background */}
-          <div className="relative z-10 w-full">
-            <CowSwapWidget 
-              key={widgetKey}
-              params={params} 
-              provider={provider} 
-            />
+          {/* Widget container - centered within the background shape */}
+          <div className="relative z-10 w-full flex justify-center">
+            <div className="w-full max-w-[392px]">
+              <CowSwapWidget 
+                key={widgetKey}
+                params={params} 
+                provider={provider} 
+              />
+            </div>
           </div>
         </div>
       </div>
