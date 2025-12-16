@@ -283,8 +283,8 @@ export default function Home() {
   }, []);
   
   return (
-    <div className="min-h-screen h-screen md:min-h-screen md:h-auto bg-gradient-to-br from-black via-gray-900 to-black flex flex-col md:block">
-      <main className="relative flex-1 flex flex-col md:block min-h-0">
+    <div className="min-h-screen md:min-h-screen md:h-auto bg-gradient-to-br from-black via-gray-900 to-black flex flex-col md:block">
+      <main className="relative flex-1 flex flex-col md:block">
       {/* Subtle Gold Gradient Overlays */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {/* Top-left gold glow */}
@@ -307,8 +307,8 @@ export default function Home() {
           <div className="w-full h-full bg-gradient-to-tl from-purple-500/35 via-purple-400/25 to-transparent blur-3xl"></div>
         </div>
       </div>
-      {/* Mobile Sticky Gold Banner - Join our Community */}
-      <div className="block md:hidden sticky top-0 left-0 right-0 z-[60] w-full">
+      {/* Mobile Gold Banner - Join our Community */}
+      <div className="block md:hidden left-0 right-0 z-[60] w-full">
         <a
           href="https://discord.gg/wxXsxm7GGb"
           target="_blank"
@@ -322,8 +322,8 @@ export default function Home() {
           Join our Community
         </a>
       </div>
-      {/* Header - Sticky on mobile */}
-      <header className="sticky top-[45px] md:top-0 left-0 right-0 z-50 backdrop-blur-sm pt-2 w-full bg-transparent border-transparent" role="banner" style={{ position: 'sticky' }}>
+      {/* Header - Sticky on desktop only */}
+      <header className="md:sticky md:top-0 left-0 right-0 z-50 backdrop-blur-sm pt-2 w-full bg-transparent border-transparent" role="banner">
         <div className="container mx-auto px-4 py-3 md:py-3 relative">
           {/* Desktop Header Layout */}
           <div className="hidden md:flex items-center justify-between gap-4">
@@ -768,11 +768,11 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Mobile Footer - Sticky at bottom for mobile viewing */}
-      <footer className={`fixed bottom-0 left-0 right-0 block md:hidden z-50 transition-all duration-300 border-t ${isScrolled ? 'bg-black/90 border-gray-800' : 'bg-transparent border-transparent'}`} role="contentinfo">
-        <div className="container mx-auto px-6 py-4">
+      {/* Mobile Footer - Fixed at bottom for mobile viewing */}
+      <footer className="fixed bottom-0 left-0 right-0 block md:hidden z-50 bg-black/90 border-t border-gray-800" role="contentinfo">
+        <div className="container mx-auto px-6 py-3">
           <div className="flex items-center justify-center">
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 text-center">
               © 2024 Vaulto. All rights reserved.
             </p>
           </div>

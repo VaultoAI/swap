@@ -57,10 +57,8 @@ body {
     position: relative;
   }
   
-  /* Prevent layout shift from address bar on mobile - use small viewport height */
+  /* Allow natural scrolling on mobile */
   html {
-    height: 100svh;
-    height: -webkit-fill-available; /* Fallback for Safari iOS */
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -69,6 +67,8 @@ body {
   body {
     min-height: 100svh;
     min-height: -webkit-fill-available; /* Fallback for Safari iOS */
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   
   /* Use small viewport height to prevent layout shifts when browser UI appears/disappears */
@@ -77,32 +77,22 @@ body {
     min-height: -webkit-fill-available; /* Fallback for Safari iOS */
   }
   
-  /* Full viewport height for mobile - exact height, no more, no less */
-  .h-screen {
-    height: 100svh;
-    height: -webkit-fill-available; /* Fallback for Safari iOS */
-  }
+  /* Full viewport height for mobile - only when explicitly needed */
+  /* Removed fixed height constraint to allow natural scrolling */
   
   /* Flex layout for full viewport on mobile */
   @media (max-width: 768px) {
-    /* Ensure root div with h-screen fills viewport exactly */
-    div.h-screen {
-      height: 100svh !important;
-      height: -webkit-fill-available !important;
-      max-height: 100svh !important;
-      max-height: -webkit-fill-available !important;
-      overflow: hidden !important;
-    }
+    /* Allow page to scroll naturally on mobile - remove height constraints */
+    /* Root div should use min-height, not fixed height, to allow scrolling */
     
-    /* Make main flex to fill remaining space after header and allow scrolling */
+    /* Make main flex to fill remaining space and allow scrolling */
     main {
       flex: 1 1 auto;
       min-height: 0;
-      overflow-y: auto;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       position: relative;
-      height: 100%;
+      padding-bottom: 4rem; /* Add padding to account for fixed footer on mobile */
     }
     
     /* Landing section container - fixed height on mobile (90vh = reduced by 25% from 120vh) */
@@ -154,24 +144,8 @@ body {
   .text-6xl { font-size: 3rem; line-height: 3.5rem; }
   .text-7xl { font-size: 3.5rem; line-height: 4rem; }
   
-  /* Mobile header adjustments - ensure sticky works */
-  header.sticky,
-  .sticky {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-  }
-  
-  /* Ensure header stays on top during scroll on mobile */
-  header[role="banner"] {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 50 !important;
-  }
+  /* Mobile header adjustments - NOT sticky on mobile, allow scrolling */
+  /* Removed sticky positioning for mobile to allow headers to scroll away */
   
   /* Mobile footer positioning */
   .fixed {
@@ -215,13 +189,8 @@ body {
     min-height: auto;
   }
   
-  /* Mobile sticky gold banner - ensure it stays at top */
-  /* The banner uses Tailwind classes for sticky positioning */
-  /* Additional CSS ensures cross-browser compatibility */
-  [class*="sticky"][class*="md:hidden"] {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-  }
+  /* Mobile gold banner - NOT sticky on mobile, allow scrolling */
+  /* Removed sticky positioning for mobile to allow banner to scroll away */
   
   /* Mobile search bar dropdown z-index - ensure it appears above header */
   .token-dropdown-scrollbar {
