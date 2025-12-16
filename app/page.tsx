@@ -283,7 +283,7 @@ export default function Home() {
   }, []);
   
   return (
-    <div className="min-h-screen md:min-h-screen md:h-auto bg-gradient-to-br from-black via-gray-900 to-black flex flex-col md:block">
+    <div className="min-h-screen md:min-h-screen md:h-auto bg-black md:bg-gradient-to-br md:from-black md:via-gray-900 md:to-black flex flex-col md:block">
       <main className="relative flex-1 flex flex-col md:block">
       {/* Subtle Gold Gradient Overlays */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
@@ -302,8 +302,8 @@ export default function Home() {
           <div className="w-full h-full bg-gradient-to-t from-yellow-500/20 via-yellow-300/12 to-transparent blur-3xl"></div>
         </div>
         
-        {/* Bottom-right purple glow */}
-        <div className="absolute -bottom-32 -right-32 w-[800px] h-[800px] animate-[float_22s_ease-in-out_infinite]">
+        {/* Bottom-right purple glow - hidden on mobile to prevent showing below footer */}
+        <div className="absolute -bottom-32 -right-32 w-[800px] h-[800px] animate-[float_22s_ease-in-out_infinite] hidden md:block">
           <div className="w-full h-full bg-gradient-to-tl from-purple-500/35 via-purple-400/25 to-transparent blur-3xl"></div>
         </div>
       </div>
@@ -769,7 +769,7 @@ export default function Home() {
       </footer>
 
       {/* Mobile Footer - Fixed at bottom for mobile viewing */}
-      <footer className="fixed bottom-0 left-0 right-0 block md:hidden z-50 bg-black/90 border-t border-gray-800" role="contentinfo">
+      <footer className="fixed bottom-0 left-0 right-0 block md:hidden z-50 bg-black border-t border-gray-800" role="contentinfo">
         <div className="container mx-auto px-6 py-3">
           <div className="flex items-center justify-center">
             <p className="text-xs text-gray-400 text-center">
