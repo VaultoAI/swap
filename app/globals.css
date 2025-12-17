@@ -589,7 +589,7 @@ button[aria-label="Connect Wallet"] {
 /* CSS Variables - RGB comma-separated format as required by Jupiter */
 :root {
   --jupiter-plugin-primary: 250, 204, 20;
-  --jupiter-plugin-background: 31, 41, 55;
+  --jupiter-plugin-background: 32, 44, 60;
   --jupiter-plugin-primary-text: 232, 249, 255;
   --jupiter-plugin-warning: 251, 191, 36;
   --jupiter-plugin-interactive: 18, 24, 33;
@@ -599,7 +599,7 @@ button[aria-label="Connect Wallet"] {
 .jupiter-widget-container,
 #jupiter-widget-container {
   --jupiter-plugin-primary: 250, 204, 20;
-  --jupiter-plugin-background: 31, 41, 55;
+  --jupiter-plugin-background: 32, 44, 60;
   --jupiter-plugin-primary-text: 232, 249, 255;
   --jupiter-plugin-warning: 251, 191, 36;
   --jupiter-plugin-interactive: 18, 24, 33;

@@ -255,7 +255,7 @@ export default function JupiterWidgetWrapper() {
               maxWidth: '392px', // Fixed max width on desktop
               height: '500px', // Reduced height on mobile
               top: '0',
-              backgroundColor: 'rgb(31, 41, 55)', // Dark theme background color (matches CowSwap)
+              backgroundColor: 'rgb(32, 44, 60)',
               zIndex: 0,
             }}
           />

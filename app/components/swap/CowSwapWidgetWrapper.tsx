@@ -1602,23 +1602,25 @@ export default function CowSwapWidgetWrapper({ onTokenSelect }: CowSwapWidgetWra
         {/* Container for both background shape and widget - ensures they're perfectly aligned */}
         {/* Mobile: full width with padding, Desktop: fixed 392px width */}
         <div className="relative w-full md:w-[392px] min-h-[500px]">
-          {/* Background element behind widget with rounded corners - spans edge-to-edge */}
+          {/* Background element behind widget with rounded corners - matches Jupiter widget width */}
           <div 
-            className="absolute rounded-2xl left-0 right-0"
+            className="absolute rounded-2xl left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0"
             style={{
-              width: '100%', // Use 100% to fill parent container edge-to-edge
+              width: 'calc(100vw - 2rem)', // Fixed width on mobile (full viewport minus padding)
+              maxWidth: '392px', // Fixed max width on desktop
               height: '500px',
               top: '0',
-              backgroundColor: 'rgb(31, 41, 55)', // Dark theme background color (matches Jupiter)
+              backgroundColor: 'rgb(32, 44, 60)', // Dark theme background color (matches Jupiter)
               zIndex: 0,
             }}
           />
           
           {/* Widget container - matches background shape width exactly, centered */}
           <div 
-            className="relative z-10 w-full overflow-hidden"
+            className="absolute z-10 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0 overflow-hidden"
             style={{
-              width: '100%', // Use 100% to fill background element edge-to-edge
+              width: 'calc(100vw - 2rem)', // Match background shape width
+              maxWidth: '392px', // Match background shape max width
             }}
           >
             <div 

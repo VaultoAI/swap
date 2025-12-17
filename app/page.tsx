@@ -437,7 +437,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="relative z-10 container mx-auto px-4 flex flex-col md:block h-[90vh] md:h-auto md:min-h-screen py-4 md:py-6 sm:py-8 pt-2 md:pt-12 overflow-hidden md:overflow-visible">
+      <div className="relative z-10 container mx-auto px-4 flex flex-col md:block h-[90vh] md:h-auto md:min-h-screen pt-2 md:pt-12 pb-0 overflow-hidden md:overflow-visible">
         <section aria-label="Token swap interface" className="w-full h-full flex flex-col md:block md:h-auto md:min-h-0">
           <h1 className="sr-only">Vaulto Swap - Trade Tokenized Stocks with Stablecoins</h1>
           
@@ -462,7 +462,7 @@ export default function Home() {
       </div>
 
         {/* Private Markets Section */}
-        <section className="relative z-10 w-full bg-black pt-8 sm:pt-12 md:pt-16 pb-20 md:pb-0 overflow-hidden">
+        <section className="relative z-10 w-full bg-black pt-8 sm:pt-12 md:pt-16 pb-20 md:pb-0 overflow-hidden" style={{ marginTop: '-100px' }}>
           <div className="container mx-auto px-4">
             {/* Social Media Icons - Mobile only, above Private Markets text */}
             <div className="flex items-center justify-center gap-4 mb-6 md:hidden">
