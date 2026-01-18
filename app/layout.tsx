@@ -87,6 +87,13 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#000000',
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -121,16 +128,12 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-        <meta name="theme-color" content="#000000" />
+      <body className={inter.className}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
         <script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
-      </head>
-      <body className={inter.className}>
         {/* Google tag (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-Y8W2H3EQJD"

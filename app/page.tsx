@@ -10,9 +10,9 @@ import TokenSearch from "./components/TokenSearch";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
-// Dynamically import the CoW widget to prevent SSR issues
-const CowSwapWidgetWrapper = dynamic(
-  () => import("./components/swap/CowSwapWidgetWrapper"),
+// Dynamically import the Li.Fi widget to prevent SSR issues
+const LiFiWidgetWrapper = dynamic(
+  () => import("./components/swap/LiFiWidgetWrapper"),
   { 
     ssr: false
   }
@@ -453,7 +453,7 @@ export default function Home() {
           
           <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col md:block">
             {activeTab === 'public' ? (
-              <CowSwapWidgetWrapper />
+              <LiFiWidgetWrapper />
             ) : (
               <JupiterWidgetWrapper />
             )}

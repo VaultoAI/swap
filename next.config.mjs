@@ -57,9 +57,15 @@ const nextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ['@cowprotocol/widget-react', 'wagmi'],
+    optimizePackageImports: ['@lifi/widget', 'wagmi'],
   },
   webpack: (config, { isServer, webpack }) => {
+    // Externalize yahoo-finance2 for server-side only
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push('yahoo-finance2');
+    }
+    
     config.resolve.fallback = { 
       ...config.resolve.fallback,
       fs: false, 
@@ -98,9 +104,9 @@ const nextConfig = {
           chunks: 'all',
           priority: 20,
         },
-        cowprotocol: {
-          test: /[\\/]node_modules[\\/]@cowprotocol[\\/]/,
-          name: 'cowprotocol',
+        lifi: {
+          test: /[\\/]node_modules[\\/]@lifi[\\/]/,
+          name: 'lifi',
           chunks: 'all',
           priority: 20,
         },

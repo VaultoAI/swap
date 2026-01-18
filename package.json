@@ -13,7 +13,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@cowprotocol/widget-react": "^0.14.0",
+    "@bigmi/react": "^0.6.0",
+    "@lifi/widget": "^3.40.2",
+    "@mysten/dapp-kit": "^0.19.0",
     "@rainbow-me/rainbowkit": "^2.2.9",
     "@solana/wallet-adapter-base": "^0.9.27",
     "@solana/wallet-adapter-react": "^0.15.39",
