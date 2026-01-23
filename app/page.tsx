@@ -2,13 +2,12 @@
 
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { useAccount, useDisconnect, useChainId } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useEffect, useRef, useState } from "react";
-import { trackWalletConnectClick, trackWalletConnected, trackWalletDisconnected } from "@/lib/utils/analytics";
+import { useChainId } from "wagmi";
+import { useEffect, useState } from "react";
+import { trackWalletConnectClick } from "@/lib/utils/analytics";
 import TokenSearch from "./components/TokenSearch";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 // Dynamically import the Li.Fi widget to prevent SSR issues
 const LiFiWidgetWrapper = dynamic(
@@ -18,259 +17,22 @@ const LiFiWidgetWrapper = dynamic(
   }
 );
 
-// Dynamically import the Jupiter widget to prevent SSR issues
-const JupiterWidgetWrapper = dynamic(
-  () => import("./components/swap/JupiterWidgetWrapper"),
-  { 
-    ssr: false
-  }
-);
 
-
-// Wallet button component - shows Ethereum or Solana wallet based on active tab
-function WalletButton({ activeTab }: { activeTab: 'public' | 'private' }) {
-  // Ethereum wallet hooks
-  const { address, isConnected, connector } = useAccount();
-  const chainId = useChainId();
-  const { disconnect: disconnectEthereum } = useDisconnect();
-  const wasConnectedRef = useRef(false);
-  
-  // Solana wallet hooks
-  const solanaWallet = useWallet();
-  const { setVisible } = useWalletModal();
-
-  // Track Ethereum wallet connection
-  useEffect(() => {
-    if (activeTab === 'public' && isConnected && address && !wasConnectedRef.current) {
-      trackWalletConnected(
-        address,
-        chainId,
-        connector?.name || 'unknown'
-      );
-      wasConnectedRef.current = true;
-    } else if (activeTab === 'public' && !isConnected && wasConnectedRef.current) {
-      trackWalletDisconnected();
-      wasConnectedRef.current = false;
-    }
-  }, [isConnected, address, chainId, connector, activeTab]);
-
-  // Solana wallet handlers
-  const handleSolanaConnect = () => {
-    trackWalletConnectClick();
-    setVisible(true);
-  };
-
-  const handleSolanaDisconnect = () => {
-    solanaWallet.disconnect();
-  };
-
-  // Ethereum wallet handlers
-  const handleEthereumDisconnect = () => {
-    disconnectEthereum();
-  };
-
-  // Render based on active tab
-  if (activeTab === 'private') {
-    // Solana wallet button
-    if (solanaWallet.connected && solanaWallet.publicKey) {
-      return (
-        <button
-          onClick={handleSolanaDisconnect}
-          className="px-2 py-1 md:px-3 md:py-2 bg-red-500/10 border border-red-500/30 rounded-lg backdrop-blur-sm hover:bg-red-500/20 hover:border-red-500/50 transition-all duration-200 flex items-center justify-center group"
-          title="Disconnect Wallet"
-          aria-label="Disconnect Wallet"
-        >
-          <svg 
-            className="w-5 h-5 md:w-6 md:h-6 text-red-400 group-hover:text-red-300 transition-colors duration-200" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
-            />
-          </svg>
-        </button>
-      );
-    }
-
-    return (
-      <button
-        onClick={handleSolanaConnect}
-        className="px-4 py-2 md:px-4 md:py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-black font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/25 flex items-center justify-center gap-2 min-w-[80px]"
-        title="Connect Solana Wallet"
-        aria-label="Connect Solana Wallet"
-      >
-        <svg
-          className="hidden md:block w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-          />
-        </svg>
-        <span className="inline md:inline text-sm whitespace-nowrap">Connect</span>
-      </button>
-    );
-  }
-
-  // Ethereum wallet button (Public tab) - original implementation
-  if (isConnected) {
-    return (
-      <button
-        onClick={handleEthereumDisconnect}
-        className="px-2 py-1 md:px-3 md:py-2 bg-red-500/10 border border-red-500/30 rounded-lg backdrop-blur-sm hover:bg-red-500/20 hover:border-red-500/50 transition-all duration-200 flex items-center justify-center group"
-        title="Disconnect Wallet"
-        aria-label="Disconnect Wallet"
-      >
-        <svg 
-          className="w-5 h-5 md:w-6 md:h-6 text-red-400 group-hover:text-red-300 transition-colors duration-200" 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={2} 
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
-          />
-        </svg>
-      </button>
-    );
-  }
-
-  // When not connected, use ConnectButton.Custom with responsive styling
+// Wallet button component - uses RainbowKit
+function WalletButton() {
   return (
-    <ConnectButton.Custom>
-      {({ account, chain, openConnectModal, mounted }) => {
-        const ready = mounted;
-        const connected = ready && account && chain;
-
-        if (connected) {
-          return null; // This shouldn't happen as we check isConnected above, but just in case
-        }
-
-        return (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              trackWalletConnectClick();
-              openConnectModal();
-            }}
-            className="px-4 py-2.5 md:px-4 md:py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-black font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/25 flex items-center justify-center gap-2 min-w-[80px] w-auto h-auto !w-auto !h-auto"
-            style={{ width: 'auto', height: 'auto', minWidth: '80px' }}
-            title="Connect Wallet"
-            aria-label="Connect Wallet"
-          >
-            <svg
-              className="hidden md:block w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-              />
-            </svg>
-            <span className="inline md:inline text-sm whitespace-nowrap">Connect</span>
-          </button>
-        );
-      }}
-    </ConnectButton.Custom>
-  );
-}
-
-
-// Market tab switcher component - Desktop version
-function MarketTabSwitcher({ activeTab, onTabChange }: { activeTab: 'public' | 'private'; onTabChange: (tab: 'public' | 'private') => void }) {
-  return (
-    <nav aria-label="Market navigation" className="hidden md:block">
-      <ul className="flex items-center gap-4">
-        <li>
-          <button
-            onClick={() => onTabChange('public')}
-            className={`text-sm transition-colors ${
-              activeTab === 'public'
-                ? 'text-white'
-                : 'text-gray-400 hover:text-white'
-            }`}
-            aria-label="Public Markets"
-            aria-pressed={activeTab === 'public'}
-          >
-            Public
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={() => onTabChange('private')}
-            className={`text-sm transition-colors ${
-              activeTab === 'private'
-                ? 'text-white'
-                : 'text-gray-400 hover:text-white'
-            }`}
-            aria-label="Private Markets"
-            aria-pressed={activeTab === 'private'}
-          >
-            Private
-          </button>
-        </li>
-      </ul>
-    </nav>
-  );
-}
-
-// Mobile market tab switcher component
-function MobileMarketTabSwitcher({ activeTab, onTabChange }: { activeTab: 'public' | 'private'; onTabChange: (tab: 'public' | 'private') => void }) {
-  return (
-    <nav aria-label="Market navigation" className="block md:hidden">
-      <div className="flex items-center gap-1 bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 rounded-lg p-0.5">
-        <button
-          onClick={() => onTabChange('public')}
-          className={`flex-1 px-2 py-1 text-xs font-semibold rounded-md transition-all duration-200 ${
-            activeTab === 'public'
-              ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black shadow-md shadow-yellow-500/25'
-              : 'text-gray-400 hover:text-gray-300'
-          }`}
-          aria-label="Public Markets"
-          aria-pressed={activeTab === 'public'}
-        >
-          Public
-        </button>
-        <button
-          onClick={() => onTabChange('private')}
-          className={`flex-1 px-2 py-1 text-xs font-semibold rounded-md transition-all duration-200 ${
-            activeTab === 'private'
-              ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black shadow-md shadow-yellow-500/25'
-              : 'text-gray-400 hover:text-gray-300'
-          }`}
-          aria-label="Private Markets"
-          aria-pressed={activeTab === 'private'}
-        >
-          Private
-        </button>
-      </div>
-    </nav>
+    <div onClick={() => trackWalletConnectClick()}>
+      <ConnectButton 
+        chainStatus="icon"
+        showBalance={false}
+      />
+    </div>
   );
 }
 
 export default function Home() {
   const chainId = useChainId();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeTab, setActiveTab] = useState<'public' | 'private'>('public');
   const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
 
   useEffect(() => {
@@ -283,8 +45,10 @@ export default function Home() {
   }, []);
   
   return (
-    <div className="min-h-screen md:h-screen bg-black md:bg-gradient-to-br md:from-black md:via-gray-900 md:to-black flex flex-col md:block overflow-y-auto">
+    <div className="min-h-screen bg-black flex flex-col md:block md:overflow-y-auto">
       <main className="relative flex-1 flex flex-col md:block">
+      {/* Hero Section - Fixed at viewport height on desktop */}
+      <div className="relative min-h-screen md:h-screen md:overflow-hidden bg-black md:bg-gradient-to-br md:from-black md:via-gray-900 md:to-black flex flex-col">
       {/* Subtle Gold Gradient Overlays */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {/* Top-left gold glow */}
@@ -363,19 +127,17 @@ export default function Home() {
               </nav>
             </div>
             
-            {/* Right side: Market Tab Switcher and Connect Wallet Button */}
+            {/* Right side: Connect Wallet Button */}
             <div className="flex items-center gap-4 flex-shrink-0">
-              {/* Market Tab Switcher */}
-              <MarketTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
-              {/* Connect Wallet Button - Shows Ethereum or Solana based on active tab */}
-              <WalletButton activeTab={activeTab} />
+              {/* Connect Wallet Button */}
+              <WalletButton />
             </div>
           </div>
           
           {/* Desktop Token Search Bar - Centered in header */}
           <div className="hidden md:block absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-md px-4 pointer-events-none">
             <div className="flex justify-center pointer-events-auto">
-              <TokenSearch chainId={chainId} activeTab={activeTab} onDropdownToggle={setIsSearchDropdownOpen} />
+              <TokenSearch chainId={chainId} onDropdownToggle={setIsSearchDropdownOpen} />
             </div>
           </div>
           
@@ -401,8 +163,8 @@ export default function Home() {
 
           {/* Mobile Header Layout */}
           <div className="block md:hidden space-y-3">
-            {/* Top row: Logo, Vaulto name/Trade Equities text, and Wallet Button */}
-            <div className="flex items-center gap-3">
+            {/* Top row: Logo and Wallet Button */}
+            <div className="flex items-center justify-between gap-3">
               <Image
                 src="/mobilelogo.png"
                 alt="Vaulto Swap"
@@ -411,55 +173,31 @@ export default function Home() {
                 className="object-contain w-12 h-12 flex-shrink-0"
                 priority
               />
-              <div className="flex-1">
-                <h2 className="text-5xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 via-yellow-500 to-yellow-400 mb-1 tracking-tight drop-shadow-lg" style={{textShadow: '0 0 20px rgba(255, 215, 0, 0.3)'}}>
-                  Vaulto
-                </h2>
-                <p className="text-white text-base sm:text-lg font-light">
-                  Trade Equities 24/7
-                </p>
-              </div>
               <div className="flex-shrink-0">
-                <WalletButton activeTab={activeTab} />
+                <WalletButton />
               </div>
             </div>
             
             {/* Second row: Search Bar */}
             <div className="w-full">
-              <TokenSearch chainId={chainId} activeTab={activeTab} />
-            </div>
-            
-            {/* Third row: Tab Switcher */}
-            <div className="w-full">
-              <MobileMarketTabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+              <TokenSearch chainId={chainId} />
             </div>
           </div>
         </div>
       </header>
 
-      <div className="relative z-10 container mx-auto px-4 flex flex-col md:block h-[90vh] md:h-screen pt-2 md:pt-12 pb-0 overflow-hidden">
-        <section aria-label="Token swap interface" className="w-full h-full flex flex-col md:block md:h-auto">
+      <div className="relative z-10 container mx-auto px-4 flex flex-col items-center justify-center flex-1 md:h-full pt-8 md:pt-16 pb-8">
+        <section aria-label="Token swap interface" className="w-full max-w-md mx-auto">
           <h1 className="sr-only">Vaulto Swap - Trade Tokenized Stocks with Stablecoins</h1>
           
-          {/* Typography Section - Hidden on mobile, shown on desktop */}
-          <div className="hidden md:block text-center mb-6 md:mb-8 mt-0 md:mt-0 pt-4 md:pt-0">
-            <h2 className="text-6xl sm:text-7xl md:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 via-yellow-500 to-yellow-400 mb-3 sm:mb-4 md:mb-4 tracking-tight drop-shadow-lg" style={{textShadow: '0 0 20px rgba(255, 215, 0, 0.3)'}}>
-              Vaulto
-            </h2>
-            <p className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-light mb-6 md:mb-0">
-              Trade Equities 24/7
-            </p>
-          </div>
-          
-          <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col md:block">
-            {activeTab === 'public' ? (
-              <LiFiWidgetWrapper />
-            ) : (
-              <JupiterWidgetWrapper />
-            )}
+          {/* LiFi Widget Centered */}
+          <div className="w-full">
+            <LiFiWidgetWrapper />
           </div>
         </section>
       </div>
+      </div>
+      {/* End Hero Section */}
 
         {/* Private Markets Section */}
         <section className="relative z-10 w-full bg-black pt-16 sm:pt-20 md:pt-24 pb-20 md:pb-0 overflow-hidden">

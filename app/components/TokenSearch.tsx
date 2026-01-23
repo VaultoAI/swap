@@ -45,7 +45,6 @@ interface Token {
 
 interface TokenSearchProps {
   chainId: number;
-  activeTab?: 'public' | 'private';
   onDropdownToggle?: (isOpen: boolean) => void;
 }
 
@@ -402,7 +401,7 @@ const isVerifiedToken = (token: Token, privateTokenAddresses: Set<string>): bool
   return isOndoStock || isPrivateStock;
 };
 
-export default function TokenSearch({ chainId, activeTab = 'public', onDropdownToggle }: TokenSearchProps) {
+export default function TokenSearch({ chainId, onDropdownToggle }: TokenSearchProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [tokens, setTokens] = useState<Token[]>([]);
   const [filteredTokens, setFilteredTokens] = useState<Token[]>([]);
@@ -843,54 +842,7 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
 
   // Fetch tokens from API
   useEffect(() => {
-    // For private tab, use private tokens only
-    if (activeTab === 'private') {
-      const fetchPrivateTokensWithData = async () => {
-        setIsLoading(true);
-        // Set tokens first to show them immediately
-        setTokens(privateTokens);
-        fetchTokenLogos(privateTokens);
-        
-        // Fetch liquidity/marketcap data for private tokens
-        try {
-          const addresses = privateTokens.map((token) => token.address);
-          const tokenData = await fetchSolanaTokenData(addresses);
-          
-          // Create a map for quick lookup
-          const dataMap = new Map(
-            tokenData.map((data) => [data.address, data])
-          );
-          
-          // Enrich private tokens with fetched data
-          const enrichedTokens = privateTokens.map((token) => {
-            const data = dataMap.get(token.address);
-            if (data) {
-              return {
-                ...token,
-                tvlUSD: data.tvlUSD,
-                volumeUSD: data.volumeUSD,
-                marketCap: data.marketCap,
-                marketCapFormatted: data.marketCapFormatted,
-                priceChange24h: data.priceChange24h,
-              };
-            }
-            return token;
-          });
-          
-          setTokens(enrichedTokens);
-        } catch (error) {
-          console.error('Error enriching private tokens with data:', error);
-          // Continue with unenriched tokens on error
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      
-      fetchPrivateTokensWithData();
-      return;
-    }
-
-    const fetchTokens = async () => {
+    const fetchAllTokens = async () => {
       setIsLoading(true);
       const allTokens: Token[] = [];
       
@@ -989,13 +941,48 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
           setTokens(fallbackTokens);
           fetchTokenLogos(fallbackTokens);
         }
+        
+        // Also add private tokens and enrich them with Solana data
+        try {
+          const addresses = privateTokens.map((token) => token.address);
+          const tokenData = await fetchSolanaTokenData(addresses);
+          
+          // Create a map for quick lookup
+          const dataMap = new Map(
+            tokenData.map((data) => [data.address, data])
+          );
+          
+          // Enrich private tokens with fetched data
+          const enrichedPrivateTokens = privateTokens.map((token) => {
+            const data = dataMap.get(token.address);
+            if (data) {
+              return {
+                ...token,
+                tvlUSD: data.tvlUSD,
+                volumeUSD: data.volumeUSD,
+                marketCap: data.marketCap,
+                marketCapFormatted: data.marketCapFormatted,
+                priceChange24h: data.priceChange24h,
+              };
+            }
+            return token;
+          });
+          
+          // Add private tokens to the token list
+          setTokens((currentTokens) => [...currentTokens, ...enrichedPrivateTokens]);
+          fetchTokenLogos(enrichedPrivateTokens);
+        } catch (error) {
+          console.error('Error enriching private tokens with data:', error);
+          // Continue without private tokens on error
+        }
       } catch (error) {
         console.error('TokenSearch: Unexpected error fetching tokens:', error);
         // Fallback to hardcoded tokens on unexpected error
         const cowChainId = getCowChainId(chainId);
         const fallbackTokens = [
           ...standardTokens.filter(t => t.chainId === cowChainId || (cowChainId !== 1 && t.chainId === 1)),
-          ...vaultoTokens.filter(t => t.chainId === cowChainId)
+          ...vaultoTokens.filter(t => t.chainId === cowChainId),
+          ...privateTokens
         ];
         setTokens(fallbackTokens);
         fetchTokenLogos(fallbackTokens);
@@ -1004,16 +991,11 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
       }
     };
 
-    fetchTokens();
-  }, [chainId, processAndSetTokens, fetchTokenLogos, standardTokens, vaultoTokens, activeTab, privateTokens]);
+    fetchAllTokens();
+  }, [chainId, processAndSetTokens, fetchTokenLogos, standardTokens, vaultoTokens, privateTokens]);
 
   // Periodic refresh for private token market cap data
   useEffect(() => {
-    // Only set up periodic refresh when private tab is active
-    if (activeTab !== 'private') {
-      return;
-    }
-
     const refreshPrivateTokensData = async () => {
       try {
         const addresses = privateTokens.map((token) => token.address);
@@ -1051,26 +1033,41 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
     refreshPrivateTokensData();
     const intervalId = setInterval(refreshPrivateTokensData, 60000);
 
-    // Cleanup interval on unmount or tab switch
+    // Cleanup interval on unmount
     return () => {
       clearInterval(intervalId);
     };
-  }, [activeTab, privateTokens]);
+  }, [privateTokens]);
 
   // Default tokens to show when search is first opened
   const getDefaultTokens = useCallback((): Token[] => {
     const cowChainId = getCowChainId(chainId);
-    const defaultSymbols = ['NVDAon', 'PLTRon', 'AAPLon', 'SPYon'];
     
-    // Find default tokens from the loaded tokens list, matching current chain
-    const defaultTokens = defaultSymbols
+    // Mix of public tokenized stocks (Ondo tokens)
+    const publicDefaultSymbols = ['AAPLon', 'NVDAon', 'SPYon'];
+    
+    // Mix of private stocks (Prestock tokens)
+    const privateDefaultSymbols = ['Anduril', 'OpenAI', 'SpaceX'];
+    
+    // Find public tokens from loaded list matching current chain
+    const publicTokens = publicDefaultSymbols
       .map(symbol => tokens.find(token => 
         token.symbol === symbol && token.chainId === cowChainId
       ))
       .filter((token): token is Token => token !== undefined);
     
-    // Limit to 4 on mobile
-    return isMobile ? defaultTokens.slice(0, 4) : defaultTokens;
+    // Find private tokens from loaded list (chainId 101 for Solana)
+    const privateStocks = privateDefaultSymbols
+      .map(symbol => tokens.find(token => token.symbol === symbol))
+      .filter((token): token is Token => token !== undefined);
+    
+    // Combine and sort alphabetically by symbol
+    const combined = [...publicTokens, ...privateStocks].sort((a, b) => 
+      a.symbol.localeCompare(b.symbol)
+    );
+    
+    // Limit to 4 on mobile, 6 on desktop
+    return isMobile ? combined.slice(0, 4) : combined.slice(0, 6);
   }, [tokens, chainId, isMobile]);
 
   // Enrich default tokens with Uniswap liquidity data
@@ -1211,33 +1208,6 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
 
   // Filter tokens based on search query with Uniswap integration
   useEffect(() => {
-    // For private tab, use simplified filtering
-    if (activeTab === 'private') {
-      if (!searchQuery.trim()) {
-        // Show all private tokens when search is open but no query
-        if (isOpen) {
-          // Use tokens state which has enriched data, but filter to only private tokens
-          const privateTokenAddresses = new Set(privateTokens.map(t => t.address));
-          const enrichedPrivateTokens = tokens.filter(t => privateTokenAddresses.has(t.address));
-          setFilteredTokens(enrichedPrivateTokens);
-        } else {
-          setFilteredTokens([]);
-        }
-      } else {
-        // Filter private tokens by name/symbol from enriched tokens
-        const query = searchQuery.trim().toLowerCase();
-        const privateTokenAddresses = new Set(privateTokens.map(t => t.address));
-        const enrichedPrivateTokens = tokens.filter(t => privateTokenAddresses.has(t.address));
-        const filtered = enrichedPrivateTokens.filter(token => 
-          token.name.toLowerCase().includes(query) || 
-          token.symbol.toLowerCase().includes(query)
-        );
-        setFilteredTokens(filtered);
-      }
-      setIsLoadingUniswap(false);
-      return;
-    }
-
     if (!searchQuery.trim()) {
       // Show default tokens when search is open but no query
       if (isOpen) {
@@ -1248,19 +1218,10 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
           setIsLoadingUniswap(true);
           enrichDefaultTokensWithUniswapData(defaultTokens)
             .then((enrichedTokens) => {
-              // Sort enriched tokens by TVL (highest to lowest)
-              const sortedTokens = enrichedTokens.sort((a, b) => {
-                const aTVL = getSortTVL(a);
-                const bTVL = getSortTVL(b);
-                
-                // Sort by TVL descending (highest to lowest)
-                if (bTVL !== aTVL) {
-                  return bTVL - aTVL;
-                }
-                
-                // If TVL is equal (including both 0), fallback to alphabetical by symbol
-                return a.symbol.localeCompare(b.symbol);
-              });
+              // Sort enriched tokens alphabetically by symbol
+              const sortedTokens = enrichedTokens.sort((a, b) => 
+                a.symbol.localeCompare(b.symbol)
+              );
               
               setFilteredTokens(sortedTokens);
               setIsLoadingUniswap(false);
@@ -1478,19 +1439,10 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
         return;
       }
 
-      // Convert map to array and sort by pool TVL (highest to lowest)
-      const allTokens = Array.from(tokenMap.values()).sort((a, b) => {
-        const aTVL = getSortTVL(a);
-        const bTVL = getSortTVL(b);
-        
-        // Sort by TVL descending (highest to lowest)
-        if (bTVL !== aTVL) {
-          return bTVL - aTVL;
-        }
-        
-        // If TVL is equal (including both 0), fallback to alphabetical by symbol
-        return a.symbol.localeCompare(b.symbol);
-      });
+      // Convert map to array and sort alphabetically by symbol
+      const allTokens = Array.from(tokenMap.values()).sort((a, b) => 
+        a.symbol.localeCompare(b.symbol)
+      );
 
       // Limit to 4 results on mobile, 10 on desktop for performance
       const maxResults = isMobile ? 4 : 10;
@@ -1504,7 +1456,7 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
         abortControllerRef.current = null;
       }
     };
-  }, [searchQuery, tokens, isOpen, getDefaultTokens, isMobile, chainId, enrichDefaultTokensWithUniswapData, activeTab, privateTokens]);
+  }, [searchQuery, tokens, isOpen, getDefaultTokens, isMobile, chainId, enrichDefaultTokensWithUniswapData, privateTokens]);
 
   // Keyboard shortcuts: "/" to open search, "Escape" to close
   useEffect(() => {
@@ -1590,8 +1542,6 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
 
   // Handle token selection - set up trading pair
   const handleTokenClick = (token: Token) => {
-    const handler = (window as any).__handleTokenSelect;
-    
     // Prepare token object with all necessary information
     const tokenForSwap: Token = {
       address: token.address,
@@ -1602,31 +1552,19 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
       chainId: token.chainId,
     };
     
-    if (handler && typeof handler === 'function') {
-      console.log('Calling token selection handler:', { 
-        symbol: tokenForSwap.symbol, 
-        address: tokenForSwap.address,
-        chainId: tokenForSwap.chainId,
-        type: 'buy' 
-      });
-      handler(tokenForSwap, 'buy');
-    } else {
-      console.warn('Token selection handler not available. Widget may not be loaded yet.');
-      // Retry after a short delay in case widget is still loading
-      setTimeout(() => {
-        const retryHandler = (window as any).__handleTokenSelect;
-        if (retryHandler && typeof retryHandler === 'function') {
-          console.log('Retrying token selection handler:', { 
-            symbol: tokenForSwap.symbol,
-            address: tokenForSwap.address,
-            type: 'buy' 
-          });
-          retryHandler(tokenForSwap, 'buy');
-        } else {
-          console.error('Token selection handler still not available after retry');
-        }
-      }, 500);
-    }
+    console.log('Token selected:', { 
+      symbol: tokenForSwap.symbol, 
+      address: tokenForSwap.address,
+      chainId: tokenForSwap.chainId,
+      type: 'buy' 
+    });
+    
+    // Dispatch custom event for LiFi widget
+    const event = new CustomEvent('tokenSelect', {
+      detail: { token: tokenForSwap, type: 'buy' }
+    });
+    window.dispatchEvent(event);
+    
     setIsOpen(false);
     setSearchQuery('');
   };
@@ -1792,11 +1730,11 @@ export default function TokenSearch({ chainId, activeTab = 'public', onDropdownT
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        {activeTab === 'private' ? (
+                        {privateTokenAddresses.has(token.address) ? (
                           // Display for private tokens - matches public token styling
                           <>
                             <div className="flex items-center justify-between gap-1 md:gap-1.5 mb-1 md:mb-1">
-                              <div className="text-white text-sm md:text-xs font-medium flex items-center gap-1.5">
+                              <div className="text-white text-sm md:text-sm font-medium flex items-center gap-1.5">
                                 {token.symbol}
                                 {isVerifiedToken(token, privateTokenAddresses) && (
                                   <span className="inline-flex items-center justify-center w-4 h-4 md:w-4 md:h-4 rounded-full bg-green-500/20 border border-green-500/30 flex-shrink-0" title="Verified">

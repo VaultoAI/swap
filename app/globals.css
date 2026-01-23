@@ -242,7 +242,7 @@ body {
   
   /* Ensure main container uses full viewport height on desktop */
   body > div.min-h-screen {
-    height: 100vh;
+    min-height: 100vh;
     overflow-y: auto;
   }
   
@@ -592,88 +592,13 @@ button[aria-label="Connect Wallet"] {
   backdrop-filter: blur(4px) !important;
 }
 
-/* Jupiter Plugin Theme Customization - Match CowSwap widget colors */
-/* CSS Variables - RGB comma-separated format as required by Jupiter */
-:root {
-  --jupiter-plugin-primary: 250, 204, 20;
-  --jupiter-plugin-background: 32, 44, 60;
-  --jupiter-plugin-primary-text: 232, 249, 255;
-  --jupiter-plugin-warning: 251, 191, 36;
-  --jupiter-plugin-interactive: 18, 24, 33;
-  --jupiter-plugin-module: 18, 24, 33;
-}
-
-.jupiter-widget-container,
-#jupiter-widget-container {
-  --jupiter-plugin-primary: 250, 204, 20;
-  --jupiter-plugin-background: 32, 44, 60;
-  --jupiter-plugin-primary-text: 232, 249, 255;
-  --jupiter-plugin-warning: 251, 191, 36;
-  --jupiter-plugin-interactive: 18, 24, 33;
-  --jupiter-plugin-module: 18, 24, 33;
-}
-
-/* Solana Wallet Modal Customization - Change title from "Connect a wallet on Solana to continue" to "Connect a wallet" */
-.wallet-adapter-modal-title {
-  font-size: 0 !important;
-  line-height: 0 !important;
-  position: relative !important;
-  text-align: center !important;
-  width: 100% !important;
-  padding-top: 1.5rem !important;
-}
-
-.wallet-adapter-modal-title::before {
-  content: "Connect a wallet" !important;
-  display: block !important;
-  font-size: 1.5rem !important;
-  font-weight: 600 !important;
-  line-height: 1.5 !important;
-  position: absolute !important;
-  left: 50% !important;
-  top: 1.5rem !important;
-  transform: translateX(-50%) !important;
-  color: inherit !important;
-  white-space: nowrap !important;
-  text-align: center !important;
-}
-
-/* Increase z-index of close button without moving it */
-.wallet-adapter-modal-button-close {
-  z-index: 9999 !important;
-}
-
-/* CowSwap Widget Responsive Width - Ensure widget matches background shape */
-/* Mobile: widget should be calc(100vw - 2rem) to match background */
-/* Desktop: widget should be 392px to match background */
+/* LiFi Widget Responsive Width */
 @media (max-width: 767px) {
-  /* Ensure CowSwap widget container respects parent width */
-  [class*="cowswap"],
-  [id*="cowswap"],
-  iframe[src*="cowswap"],
-  iframe[src*="cow.fi"] {
-    width: 100% !important;
-    max-width: calc(100vw - 2rem) !important;
-    min-width: 0 !important;
-  }
-  
-  /* Ensure widget wrapper doesn't overflow */
+  /* Ensure LiFi widget container respects parent width */
   div[class*="widget"] {
     width: 100% !important;
-    max-width: calc(100vw - 2rem) !important;
+    max-width: 100% !important;
     overflow: hidden !important;
-  }
-}
-
-/* Desktop: ensure widget is exactly 392px */
-@media (min-width: 768px) {
-  [class*="cowswap"],
-  [id*="cowswap"],
-  iframe[src*="cowswap"],
-  iframe[src*="cow.fi"] {
-    width: 392px !important;
-    max-width: 392px !important;
-    min-width: 392px !important;
   }
 }
 

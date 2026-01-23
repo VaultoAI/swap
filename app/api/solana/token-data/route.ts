@@ -37,168 +37,20 @@ function formatMarketCap(value: number): string {
 
 /**
  * Fetch market cap from Jupiter token page HTML
- * Parses the HTML to extract the market cap value from __NEXT_DATA__ script tag
- * Falls back to searching for "Stock MC" button element if needed
+ * DISABLED: Jupiter integration removed from frontend
  */
 async function fetchJupiterMarketCap(tokenAddress: string): Promise<string | null> {
-  try {
-    const url = `https://www.jup.ag/tokens/${tokenAddress}`;
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      },
-      cache: 'no-store',
-    });
-
-    if (!response.ok) {
-      console.warn(`Failed to fetch Jupiter page for ${tokenAddress}: ${response.status}`);
-      return null;
-    }
-
-    const html = await response.text();
-    const $ = cheerio.load(html);
-
-    // Strategy 1: Extract from __NEXT_DATA__ script tag (most reliable for SSR pages)
-    const nextDataScript = $('script#__NEXT_DATA__');
-    if (nextDataScript.length > 0) {
-      try {
-        const nextDataText = nextDataScript.html();
-        if (nextDataText) {
-          const nextData = JSON.parse(nextDataText);
-          
-          // Navigate through the data structure to find stockData.mcap
-          const pageProps = nextData?.props?.pageProps;
-          if (pageProps) {
-            const dehydratedState = pageProps?.dehydratedState;
-            if (dehydratedState) {
-              const queries = dehydratedState?.queries || [];
-              
-              // Search through all queries for stockData.mcap
-              for (const query of queries) {
-                const data = query?.state?.data;
-                if (data?.stockData?.mcap) {
-                  const mcap = data.stockData.mcap;
-                  if (typeof mcap === 'number' && mcap > 0) {
-                    const formatted = formatMarketCap(mcap);
-                    return formatted;
-                  }
-                }
-              }
-            }
-          }
-        }
-      } catch (parseError) {
-        console.warn(`Error parsing __NEXT_DATA__ for ${tokenAddress}:`, parseError);
-        // Continue to fallback strategies
-      }
-    }
-
-    // Strategy 2: Find the button element containing "Stock MC" text (for client-rendered content)
-    const stockMCButton = $('button').filter((_, el) => {
-      const buttonText = $(el).text();
-      return buttonText.includes('Stock MC');
-    }).first();
-
-    if (stockMCButton.length > 0) {
-      // Find the span with translate="no" attribute within the button
-      const marketCapSpan = stockMCButton.find('span[translate="no"]').first();
-
-      if (marketCapSpan.length > 0) {
-        const marketCapValue = marketCapSpan.text().trim();
-        
-        if (marketCapValue && marketCapValue !== '$0') {
-          return marketCapValue;
-        }
-      }
-    }
-
-    return null;
-  } catch (error) {
-    console.error(`Error fetching Jupiter market cap for ${tokenAddress}:`, error);
-    return null;
-  }
+  // Jupiter integration disabled - return null
+  return null;
 }
 
 /**
  * Fetch liquidity data from Jupiter API
- * Uses Jupiter's quote API to estimate available liquidity
+ * DISABLED: Jupiter integration removed from frontend
  */
 async function fetchJupiterLiquidity(tokenAddress: string): Promise<number | null> {
-  try {
-    // USDC on Solana (most common quote token)
-    const USDC_SOLANA = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
-    
-    // Try to get a quote for a large swap to estimate liquidity
-    // Using 100K USDC as input to see available liquidity depth
-    const quoteAmount = 100000 * 1e6; // 100K USDC (6 decimals)
-    
-    // Try swapping USDC -> Token first
-    const quoteResponse = await fetch(
-      `https://quote-api.jup.ag/v6/quote?inputMint=${USDC_SOLANA}&outputMint=${tokenAddress}&amount=${quoteAmount}&slippageBps=50`,
-      {
-        headers: {
-          'Accept': 'application/json',
-        },
-        cache: 'no-store',
-      }
-    );
-
-    if (quoteResponse.ok) {
-      const quoteData = await quoteResponse.json();
-      
-      if (quoteData.outAmount && quoteData.priceImpact !== undefined) {
-        const priceImpact = parseFloat(quoteData.priceImpact);
-        // If price impact is low (< 1%), there's good liquidity
-        // Estimate liquidity based on the quote amount and price impact
-        if (priceImpact < 0.01) {
-          // Good liquidity - estimate at least the quote amount
-          return 100000; // At least 100K liquidity
-        } else if (priceImpact < 0.05) {
-          // Moderate liquidity
-          return 50000; // Estimate 50K liquidity
-        } else if (priceImpact < 0.10) {
-          // Lower liquidity
-          return 10000; // Estimate 10K liquidity
-        }
-      }
-    }
-
-    // Try reverse direction (Token -> USDC)
-    const reverseAmount = 1000000 * 1e9; // 1M tokens (assuming 9 decimals, common for Solana)
-    const reverseQuoteResponse = await fetch(
-      `https://quote-api.jup.ag/v6/quote?inputMint=${tokenAddress}&outputMint=${USDC_SOLANA}&amount=${reverseAmount}&slippageBps=50`,
-      {
-        headers: {
-          'Accept': 'application/json',
-        },
-        cache: 'no-store',
-      }
-    );
-
-    if (reverseQuoteResponse.ok) {
-      const reverseQuoteData = await reverseQuoteResponse.json();
-      
-      if (reverseQuoteData.outAmount && reverseQuoteData.priceImpact !== undefined) {
-        const priceImpact = parseFloat(reverseQuoteData.priceImpact);
-        const outputUSD = parseFloat(reverseQuoteData.outAmount) / 1e6; // USDC has 6 decimals
-        
-        if (priceImpact < 0.01 && outputUSD > 0) {
-          // Good liquidity - use output amount as estimate
-          return outputUSD * 10; // Multiply by 10 as rough estimate
-        } else if (priceImpact < 0.05 && outputUSD > 0) {
-          return outputUSD * 5;
-        } else if (priceImpact < 0.10 && outputUSD > 0) {
-          return outputUSD * 2;
-        }
-      }
-    }
-    
-    return null;
-  } catch (error) {
-    console.error(`Error fetching Jupiter liquidity for ${tokenAddress}:`, error);
-    return null;
-  }
+  // Jupiter integration disabled - return null
+  return null;
 }
 
 /**

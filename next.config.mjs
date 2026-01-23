@@ -57,7 +57,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ['@lifi/widget', 'wagmi'],
+    optimizePackageImports: ['wagmi'],
   },
   webpack: (config, { isServer, webpack }) => {
     // Externalize yahoo-finance2 for server-side only
@@ -101,12 +101,6 @@ const nextConfig = {
         wagmi: {
           test: /[\\/]node_modules[\\/](wagmi|viem)[\\/]/,
           name: 'wagmi',
-          chunks: 'all',
-          priority: 20,
-        },
-        lifi: {
-          test: /[\\/]node_modules[\\/]@lifi[\\/]/,
-          name: 'lifi',
           chunks: 'all',
           priority: 20,
         },
