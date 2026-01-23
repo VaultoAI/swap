@@ -35,33 +35,26 @@ export default function LiFiWidgetWrapper() {
     buildUrl: true, // Enable URL updates for form changes
     variant: 'compact',
     subvariant: 'default',
-    appearance: 'light',
+    appearance: 'dark',
     theme: {
       colorSchemes: {
         light: {
           palette: {
             primary: {
-              main: '#cda116',
+              main: '#5C67FF',
             },
             secondary: {
-              main: '#006EFF',
+              main: '#F7C2FF',
             },
-            background: {
-              default: '#1f2937',
-              paper: '#121821',
+          },
+        },
+        dark: {
+          palette: {
+            primary: {
+              main: '#5C67FF',
             },
-            text: {
-              primary: '#ffffff',
-              secondary: '#ffffff',
-            },
-            grey: {
-              200: '#EEEFF2',
-              300: '#D5DAE1',
-              700: '#555B62',
-              800: '#373F48',
-            },
-            playground: {
-              main: '#f3f5f8',
+            secondary: {
+              main: '#F7C2FF',
             },
           },
         },
@@ -72,27 +65,6 @@ export default function LiFiWidgetWrapper() {
       container: {
         boxShadow: '0px 8px 32px rgba(0, 0, 0, 0.08)',
         borderRadius: '16px',
-      },
-      shape: {
-        borderRadius: 12,
-        borderRadiusSecondary: 12,
-        borderRadiusTertiary: 24,
-      },
-      components: {
-        MuiCard: {
-          defaultProps: {
-            variant: 'filled',
-          },
-        },
-        MuiNavigationTabs: {
-          styleOverrides: {
-            root: {
-              '.MuiTabs-indicator': {
-                backgroundColor: '#f8f8fa',
-              },
-            },
-          },
-        },
       },
     },
     // Initialize with USDC to NVDA (NVDAon) on Ethereum mainnet, $100 amount
