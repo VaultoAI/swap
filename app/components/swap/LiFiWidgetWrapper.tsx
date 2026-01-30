@@ -33,7 +33,7 @@ export default function LiFiWidgetWrapper() {
   
   const config: Partial<WidgetConfig> = {
     buildUrl: true, // Enable URL updates for form changes
-    variant: 'wide',
+    variant: 'compact',
     appearance: 'dark',
     theme: {
       colorSchemes: {
