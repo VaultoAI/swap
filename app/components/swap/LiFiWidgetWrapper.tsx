@@ -33,8 +33,7 @@ export default function LiFiWidgetWrapper() {
   
   const config: Partial<WidgetConfig> = {
     buildUrl: true, // Enable URL updates for form changes
-    variant: 'compact',
-    subvariant: 'default',
+    variant: 'wide',
     appearance: 'dark',
     theme: {
       colorSchemes: {
@@ -51,10 +50,13 @@ export default function LiFiWidgetWrapper() {
         dark: {
           palette: {
             primary: {
-              main: '#5C67FF',
+              main: '#ffc800',
             },
             secondary: {
-              main: '#F7C2FF',
+              main: '#fff700',
+            },
+            background: {
+              default: '#292929',
             },
           },
         },
