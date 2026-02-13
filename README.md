@@ -1,93 +1,69 @@
-# Vaulto
+# Vaulto Swap
 
-A permissionless DeFi protocol for swapping Real World Assets (RWAs) across EVM chains. Built with Next.js and powered by CoW Swap's MEV-protected batch auction engine for optimal RWA execution and settlement.
+Decentralized interface for swapping tokenized real-world assets (RWAs) across EVM chains. Part of VaultoAI's DeFi product suite.
+
+## Overview
+
+Vaulto Swap is a permissionless DeFi front end for trading tokenized US Treasuries, equities, commodities, and ETFs. It uses CoW Swap's MEV-protected batch auction engine for execution and supports Ethereum, Arbitrum, Optimism, Base, and Polygon. The application is non-custodial and does not require KYC. It is maintained by VaultoAI and available at [app.vaulto.ai](https://app.vaulto.ai).
 
 ## Features
 
-- **RWA Trading**: Swap tokenized US Treasuries, equities, commodities, and ETFs
-- **MEV Protection**: CoW Protocol integration prevents front-running and sandwich attacks
-- **Multi-Chain Support**: Trade RWAs on Ethereum, Arbitrum, Optimism, Base, and Polygon
-- **Intent-Based Trading**: Submit trading intents for optimal batch execution
-- **Non-Custodial**: Fully decentralized with no KYC requirements
-- **Professional Interface**: Mobile-optimized with institutional-grade UX
+- **RWA trading** — Swap tokenized US Treasuries, equities, commodities, and ETFs
+- **MEV protection** — CoW Protocol integration to reduce front-running and sandwich risk
+- **Multi-chain support** — Trade on Ethereum, Arbitrum, Optimism, Base, and Polygon
+- **Intent-based trading** — Submit intents for batch execution
+- **Non-custodial** — Decentralized; no KYC required
+- **Professional interface** — Mobile-optimized, institutional-grade UX
 
-## Quick Start
+## Technology Stack
+
+- **Languages:** TypeScript
+- **Frameworks / libraries:** Next.js 14, React, CoW Swap widget, Wagmi, Viem, WalletConnect v2, RainbowKit, Tailwind CSS, TanStack Query, Ethers, LiFi, Solana wallet adapters (where applicable)
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn
+- Node.js 18+ and npm (or yarn)
 - MetaMask or compatible Web3 wallet
 
 ### Installation
 
-1. **Clone the repository**
-```bash
-git clone https://github.com/charlie-818/Vaulto-Swap.git
-cd Vaulto-Swap
-```
-
-2. **Install dependencies**
 ```bash
 npm install
 ```
 
-3. **Set up environment variables**
-```bash
-cp .env.example .env.local
-```
+### Running
 
-Edit `.env.local` and add:
-- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` - Get from [WalletConnect Cloud](https://cloud.walletconnect.com)
+1. Copy `.env.example` to `.env.local` and set at least `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` (from [WalletConnect Cloud](https://cloud.walletconnect.com)).
+2. Run the development server:
 
-4. **Run development server**
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the app.
+3. Open http://localhost:3000.
 
-## Live Application
+## Configuration
 
-Try Vaulto at [app.vaulto.ai](https://app.vaulto.ai)
-
-## Technology Stack
-
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **CoW Swap Widget** - MEV-protected RWA trading interface
-- **Wagmi & Viem** - Ethereum interactions
-- **WalletConnect v2** - Wallet connection protocol
-- **Tailwind CSS** - Utility-first styling
+Set `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` in `.env.local`. For deployment, add the same variable in your platform (e.g. Vercel, Netlify).
 
 ## Project Structure
 
-```
-Vaulto-Swap/
-├── app/
-│   ├── components/
-│   │   └── swap/          # CoW Swap widget integration
-│   ├── providers.tsx       # Web3 providers setup
-│   └── page.tsx           # Main application
-├── config/
-│   ├── chains.ts          # Supported networks
-│   └── tokens.ts          # Token configurations
-└── contracts/             # Optional smart contracts
-```
+- `app/` — Next.js app (page, providers, swap components)
+- `config/` — Chain and token configuration
+- `contracts/` — Optional smart contracts
 
-## Deployment
+## Contributing
 
-### Frontend (Vercel/Netlify)
-
-1. Push to GitHub
-2. Import project in deployment platform
-3. Add `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` environment variable
-4. Deploy
-
-## Important Notice
-
-Users are responsible for ensuring their RWA trading activities comply with applicable laws and regulations in their jurisdiction. Always conduct your own research and understand the risks before trading RWAs.
+See CONTRIBUTING.md for guidelines, or contact VaultoAI engineering.
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT. See LICENSE file.
 
+## Contact
+
+VaultoAI Engineering. For support or questions, see the repository or organization documentation.
+
+**Notice:** Users are responsible for ensuring RWA trading complies with applicable laws in their jurisdiction. Conduct your own research and understand the risks before trading RWAs.
